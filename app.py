@@ -1108,22 +1108,12 @@ elif page == "Recommendation System":
                                 'Total_Trans_Ct': ['Total_Trans_Ct', 'Transaction_Count', 'total_transaction_count']
                             }
                             
-                            # Find available columns that match our desired output columns
-                            for display_col, possible_cols in col_mapping.items():
-                                for col in possible_cols:
-                                    if col in available_cols:
-                                        display_cols.append(col)
-                                        break
+                            # Debug output to see available columns
+                            st.write("Debug: Available columns in similar customers data:", available_cols)
                             
-                            # Set index column to the first column if possible, otherwise don't set index
-                            if display_cols:
-                                if display_cols[0] in ['Client_No', 'Client_Number', 'client_num', 'client_number']:
-                                    st.dataframe(similar_customers[display_cols].set_index(display_cols[0]), use_container_width=True)
-                                else:
-                                    st.dataframe(similar_customers[display_cols], use_container_width=True)
-                            else:
-                                # Just display what we have
-                                st.dataframe(similar_customers, use_container_width=True)
+                            # Just display all columns without trying to extract specific ones or set an index
+                            # This avoids KeyError issues regardless of what columns are actually available
+                            st.dataframe(similar_customers, use_container_width=True)
                     else:
                         st.error(f"Customer with client number {client_num} not found.")
         
