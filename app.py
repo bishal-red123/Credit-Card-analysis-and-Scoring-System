@@ -27,114 +27,24 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Load custom CSS with error handling
+# Load simple CSS 
 try:
     with open('style.css') as f:
         st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 except Exception as e:
-    st.warning(f"Error loading custom CSS: {str(e)}")
-    st.markdown("""
-    <style>
-    /* Fallback CSS if file can't be loaded */
-    .main .block-container {
-        padding-top: 2rem;
-        padding-bottom: 2rem;
-        max-width: 1200px;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+    st.warning(f"Error loading CSS: {str(e)}")
 
-# Function to create animated background
-def add_animated_bg():
-    st.markdown("""
-    <style>
-    /* Basic background gradient */
-    .stApp {
-        background: linear-gradient(135deg, #0E1117, #1A1F2A) !important;
-        position: relative;
-        overflow: hidden;
-    }
+# Simple header function 
+def add_simple_header():
+    st.title("Credit Scoring & Fraud Detection System")
+    st.markdown("**ADVANCED FINANCIAL ANALYTICS**")
     
-    /* Subtle dot pattern for texture */
-    .stApp::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-        background-image: radial-gradient(#7792E3 1px, transparent 1px);
-        background-size: 50px 50px;
-        opacity: 0.05;
-    }
-    
-    /* Simplified glowing effect */
-    .stApp::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-        background: 
-            radial-gradient(circle at 25% 25%, rgba(119, 146, 227, 0.1) 0%, transparent 35%),
-            radial-gradient(circle at 75% 75%, rgba(95, 103, 234, 0.07) 0%, transparent 35%);
-    }
-    
-    /* Futuristic logo animation */
-    .logo-pulse {
-        animation: pulse 3s infinite;
-    }
-    
-    @keyframes pulse {
-        0% {
-            transform: scale(1);
-            opacity: 1;
-        }
-        50% {
-            transform: scale(1.05);
-            opacity: 0.8;
-        }
-        100% {
-            transform: scale(1);
-            opacity: 1;
-        }
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-# Function to create a dynamic date display
-def add_date_display():
+    # Display current date and time
     now = datetime.now()
-    date_str = now.strftime("%B %d, %Y")
-    time_str = now.strftime("%H:%M:%S")
-    
-    st.markdown(f"""
-    <div style="position: absolute; top: 0.5rem; right: 1rem; font-size: 0.8rem; color: #7792E3; font-family: monospace; text-align: right;">
-        <div>{date_str}</div>
-        <div>{time_str}</div>
-    </div>
-    """, unsafe_allow_html=True)
+    st.text(f"Current date: {now.strftime('%B %d, %Y')} | Time: {now.strftime('%H:%M:%S')}")
 
-# Function to create futuristic logo/header
-def add_futuristic_header():
-    st.markdown("""
-    <div style="display: flex; align-items: center; margin-bottom: 1rem;">
-        <div class="logo-pulse" style="background: linear-gradient(45deg, #7792E3, #5F67EA); border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
-            <span style="color: white; font-size: 1.5rem;">💳</span>
-        </div>
-        <div>
-            <h1 style="margin: 0; padding: 0;">Credit Scoring & Fraud Detection System</h1>
-            <div style="color: #7792E3; font-size: 0.9rem; margin-top: -5px;">ADVANCED FINANCIAL ANALYTICS</div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-# Add the animated background and futuristic elements
-add_animated_bg()
-add_date_display()
+# Add simple header
+add_simple_header()
 
 # Initialize session state variables
 if 'data' not in st.session_state:
@@ -338,9 +248,7 @@ st.sidebar.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Use the futuristic header instead of plain title
-add_futuristic_header()
-
+# Header already displayed via add_simple_header() above
 # Home page
 if page == "Home":
     # Futuristic welcome banner with animation
