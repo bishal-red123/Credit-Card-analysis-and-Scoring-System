@@ -1,0 +1,146 @@
+/* Futuristic UI Styling for Credit Scoring & Fraud Detection System */
+
+/* Main container styles */
+.main .block-container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+/* Header styles */
+h1, h2, h3 {
+    background: linear-gradient(90deg, #7792E3, #5F67EA);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+    letter-spacing: -0.05em;
+    margin-bottom: 1.5rem;
+}
+
+h1 {
+    font-size: 2.5rem;
+    border-bottom: 1px solid rgba(119, 146, 227, 0.2);
+    padding-bottom: 0.75rem;
+}
+
+h2 {
+    font-size: 1.8rem;
+}
+
+h3 {
+    font-size: 1.3rem;
+}
+
+/* Card-like sections */
+[data-testid="stSidebar"] {
+    background-color: rgba(26, 31, 42, 0.8);
+    backdrop-filter: blur(10px);
+    border-right: 1px solid rgba(119, 146, 227, 0.2);
+}
+
+/* Make metric displays more futuristic */
+[data-testid="stMetric"] {
+    background: rgba(26, 31, 42, 0.6);
+    border-radius: 10px;
+    padding: 1rem;
+    border-left: 3px solid #7792E3;
+    transition: all 0.3s ease;
+}
+
+[data-testid="stMetric"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Style metric labels */
+[data-testid="stMetricLabel"] {
+    color: #B8C2E0 !important;
+    font-size: 0.9rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Style metric values */
+[data-testid="stMetricValue"] {
+    font-size: 1.4rem !important;
+    font-weight: 700 !important;
+}
+
+/* Button styling */
+.stButton > button {
+    background: linear-gradient(90deg, #7792E3, #5F67EA);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 0.5rem 2rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(119, 146, 227, 0.3);
+}
+
+.stButton > button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(119, 146, 227, 0.5);
+}
+
+/* Tabs styling */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 2px;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #1A1F2A;
+}
+
+.stTabs [data-baseweb="tab"] {
+    padding: 10px 24px;
+    border-radius: 0;
+    border: none;
+    background-color: transparent;
+    color: #B8C2E0;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.stTabs [aria-selected="true"] {
+    background-color: #7792E3 !important;
+    color: white !important;
+}
+
+/* Tables and dataframes */
+[data-testid="stTable"], [data-testid="stDataFrame"] {
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(119, 146, 227, 0.2);
+}
+
+/* Add some animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.main .element-container {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+/* Custom spinner for loading states */
+.stSpinner > div {
+    border-color: #7792E3 !important;
+}
+
+/* Code block styling */
+.stCodeBlock {
+    border-radius: 8px;
+    border: 1px solid rgba(119, 146, 227, 0.2);
+}
+
+/* Add a subtle glow to inputs */
+input, select, textarea {
+    border-radius: 6px !important;
+    border-color: rgba(119, 146, 227, 0.3) !important;
+    box-shadow: 0 0 5px rgba(119, 146, 227, 0.1) !important;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: #7792E3 !important;
+    box-shadow: 0 0 8px rgba(119, 146, 227, 0.3) !important;
+}
