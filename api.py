@@ -158,94 +158,9 @@ def api_fraud_detection(client_num):
             'message': f'Error detecting fraud: {str(e)}'
         }), 500
 
-@app.route('/api/model_metrics', methods=['GET'])
-def api_model_metrics():
-    """
-    Get model metrics for Power BI
-    """
-    global data, credit_model, fraud_model
-    try:
-        if data is None:
-            data = data_processing.load_data()
-            data, credit_data, fraud_data = data_processing.preprocess_data(data)
-            
-            # Load or train the models
-            if not credit_model.load_model():
-                credit_model.train(credit_data)
-            
-            if not fraud_model.load_model():
-                fraud_model.train(fraud_data)
-        
-        # Get model evaluations
-        credit_eval = credit_model.evaluate(credit_data)
-        fraud_eval = fraud_model.evaluate(fraud_data)
-        
-        # Convert evaluation results to JSON-serializable format
-        credit_eval_json = {}
-        fraud_eval_json = {}
-        
-        if credit_eval:
-            credit_eval_json = {
-                'accuracy': float(credit_eval['accuracy']),
-                'classification_report': credit_eval['classification_report'],
-                'feature_importance': credit_eval['feature_importance'].to_dict(orient='records')
-            }
-        
-        if fraud_eval:
-            fraud_eval_json = {
-                'accuracy': float(fraud_eval['accuracy']),
-                'auc_score': float(fraud_eval['auc_score']),
-                'classification_report': fraud_eval['classification_report'],
-                'feature_importance': fraud_eval['feature_importance'].to_dict(orient='records'),
-                'pr_curve_data': fraud_eval['pr_curve_data'].to_dict(orient='records')
-            }
-        
-        return jsonify({
-            'status': 'success',
-            'credit_model_metrics': credit_eval_json,
-            'fraud_model_metrics': fraud_eval_json
-        })
-    except Exception as e:
-        return jsonify({
-            'status': 'error',
-            'message': f'Error retrieving model metrics: {str(e)}'
-        }), 500
+# Power BI integration removed
 
-@app.route('/api/export_data', methods=['GET'])
-def api_export_data():
-    """
-    Export processed data for Power BI
-    """
-    global data
-    try:
-        if data is None:
-            data = data_processing.load_data()
-            data, _, _ = data_processing.preprocess_data(data)
-        
-        # Create a directory for exports
-        if not os.path.exists('exports'):
-            os.makedirs('exports')
-        
-        # Export CSV file for Power BI
-        export_cols = [
-            'Client_Num', 'Customer_Age', 'Gender', 'Income', 'Credit_Limit',
-            'Total_Revolving_Bal', 'Total_Trans_Amt', 'Total_Trans_Ct',
-            'Avg_Utilization_Ratio', 'Delinquent_Acc', 'credit_score',
-            'credit_score_band', 'fraud_flag'
-        ]
-        
-        data[export_cols].to_csv('exports/credit_card_data_for_powerbi.csv', index=False)
-        
-        return jsonify({
-            'status': 'success',
-            'message': 'Data exported successfully',
-            'file_path': 'exports/credit_card_data_for_powerbi.csv'
-        })
-    except Exception as e:
-        return jsonify({
-            'status': 'error',
-            'message': f'Error exporting data: {str(e)}'
-        }), 500
+# Power BI export data endpoint removed
 
 def start_api():
     """
