@@ -200,7 +200,17 @@ def load_data():
                                 # Make sure to set model features and scaler
                                 st.session_state.credit_model.features = credit_data['features']
                                 st.session_state.credit_model.scaler = credit_data['scaler']
-                                st.session_state.credit_model.train(credit_data)
+                                
+                                # Allow selection of model type (Random Forest or XGBoost)
+                                credit_model_type = st.selectbox(
+                                    "Select Credit Scoring Model Type",
+                                    options=["XGBoost (advanced)", "Random Forest (traditional)"],
+                                    index=0
+                                )
+                                
+                                # Train with selected model type
+                                model_type = 'xgb' if 'XGBoost' in credit_model_type else 'rf'
+                                st.session_state.credit_model.train(credit_data, model_type=model_type)
                             else:
                                 st.warning("Cannot train credit model: Credit data is empty or invalid")
                         # Even if model loaded, still set features/scaler from current data if available
@@ -223,7 +233,17 @@ def load_data():
                                 # Make sure to set model features and scaler
                                 st.session_state.fraud_model.features = fraud_data['features']
                                 st.session_state.fraud_model.scaler = fraud_data['scaler']
-                                st.session_state.fraud_model.train(fraud_data)
+                                
+                                # Allow selection of model type (Random Forest or XGBoost)
+                                fraud_model_type = st.selectbox(
+                                    "Select Fraud Detection Model Type",
+                                    options=["XGBoost (advanced)", "Random Forest (traditional)"],
+                                    index=0
+                                )
+                                
+                                # Train with selected model type
+                                model_type = 'xgb' if 'XGBoost' in fraud_model_type else 'rf'
+                                st.session_state.fraud_model.train(fraud_data, model_type=model_type)
                             else:
                                 st.warning("Cannot train fraud model: Fraud data is empty or invalid")
                         # Even if model loaded, still set features/scaler from current data if available
@@ -568,9 +588,25 @@ elif page == "Credit Scoring":
     
     if not model_ready:
         st.warning("Please load the data and train the models first.")
-        if st.button("Load Data and Train Models"):
-            load_data()
     else:
+        # Display model info
+        model_type = st.session_state.credit_model.model_type if hasattr(st.session_state.credit_model, 'model_type') else "Random Forest"
+        model_name = "XGBoost (Advanced)" if model_type == 'xgb' else "Random Forest (Traditional)"
+        
+        st.markdown(f"""
+        <div style="background: rgba(26, 31, 42, 0.6); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center;">
+                <div style="background: linear-gradient(45deg, #7792E3, #5F67EA); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                    <span style="color: white; font-size: 1.2rem;">🤖</span>
+                </div>
+                <div>
+                    <div style="font-size: 1rem; color: white;">Active Model: <span style="color: #7792E3; font-weight: 600;">{model_name}</span></div>
+                    <div style="font-size: 0.8rem; color: #B8C2E0;">Trained and optimized for credit risk assessment</div>
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
         # Display model information
         st.write("### Model Information")
         st.write("The credit scoring model evaluates customers' creditworthiness based on their financial behaviors, demographics, and transaction patterns.")
@@ -671,6 +707,24 @@ elif page == "Fraud Detection":
         if st.button("Load Data and Train Models"):
             load_data()
     else:
+        # Display model type info
+        model_type = st.session_state.fraud_model.model_type if hasattr(st.session_state.fraud_model, 'model_type') else "Random Forest"
+        model_name = "XGBoost (Advanced)" if model_type == 'xgb' else "Random Forest (Traditional)"
+        
+        st.markdown(f"""
+        <div style="background: rgba(26, 31, 42, 0.6); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center;">
+                <div style="background: linear-gradient(45deg, #5F67EA, #4752E9); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                    <span style="color: white; font-size: 1.2rem;">🛡️</span>
+                </div>
+                <div>
+                    <div style="font-size: 1rem; color: white;">Active Model: <span style="color: #5F67EA; font-weight: 600;">{model_name}</span></div>
+                    <div style="font-size: 0.8rem; color: #B8C2E0;">Trained and optimized for fraud risk detection</div>
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
         # Display model information
         st.write("### Model Information")
         st.write("The fraud detection model identifies potentially fraudulent transactions based on transaction patterns, customer behavior, and account characteristics.")
