@@ -1,0 +1,65 @@
+Secured Builder Card
+53% Match
+<div style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 15px;">
+    <div style="flex: 1; min-width: 120px;">
+        <div style="font-size: 0.8rem; color: #B8C2E0;">Annual Fee</div>
+        <div style="font-size: 1rem; color: white;">$0</div>
+    </div>
+    <div style="flex: 1; min-width: 120px;">
+        <div style="font-size: 0.8rem; color: #B8C2E0;">Rewards Rate</div>
+        <div style="font-size: 1rem; color: white;">1.0%</div>
+    </div>
+    <div style="flex: 1; min-width: 120px;">
+        <div style="font-size: 0.8rem; color: #B8C2E0;">Intro APR</div>
+        <div style="font-size: 1rem; color: white;">N/A</div>
+    </div>
+    <div style="flex: 1; min-width: 120px;">
+        <div style="font-size: 0.8rem; color: #B8C2E0;">Foreign Transaction Fee</div>
+        <div style="font-size: 1rem; color: white;">3.0%</div>
+    </div>
+</div>
+
+<div style="margin-bottom: 15px;">
+    <div style="font-size: 0.8rem; color: #B8C2E0; margin-bottom: 5px;">Benefits</div>
+    <ul style="color: white; margin: 0; padding-left: 20px;">
+        <li>Credit building tools</li> <li>Free credit score monitoring</li> <li>Automatic credit line reviews</li>
+    </ul>
+</div>
+
+<div>
+    <div style="font-size: 0.8rem; color: #B8C2E0; margin-bottom: 5px;">Ideal For</div>
+    <div style="color: white; font-style: italic;">Customers looking to build or repair credit</div>
+</div>
+
+Cash Back Plus
+30% Match
+<div style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 15px;">
+    <div style="flex: 1; min-width: 120px;">
+        <div style="font-size: 0.8rem; color: #B8C2E0;">Annual Fee</div>
+        <div style="font-size: 1rem; color: white;">$0</div>
+    </div>
+    <div style="flex: 1; min-width: 120px;">
+        <div style="font-size: 0.8rem; color: #B8C2E0;">Rewards Rate</div>
+        <div style="font-size: 1rem; color: white;">1.5%</div>
+    </div>
+    <div style="flex: 1; min-width: 120px;">
+        <div style="font-size: 0.8rem; color: #B8C2E0;">Intro APR</div>
+        <div style="font-size: 1rem; color: white;">0% for 15 months</div>
+    </div>
+    <div style="flex: 1; min-width: 120px;">
+        <div style="font-size: 0.8rem; color: #B8C2E0;">Foreign Transaction Fee</div>
+        <div style="font-size: 1rem; color: white;">3.0%</div>
+    </div>
+</div>
+
+<div style="margin-bottom: 15px;">
+    <div style="font-size: 0.8rem; color: #B8C2E0; margin-bottom: 5px;">Benefits</div>
+    <ul style="color: white; margin: 0; padding-left: 20px;">
+        <li>2x points on groceries and gas</li> <li>Cell phone protection</li> <li>Extended warranty</li>
+    </ul>
+</div>
+
+<div>
+    <div style="font-size: 0.8rem; color: #B8C2E0; margin-bottom: 5px;">Ideal For</div>
+    <div style="color: white; font-style: italic;">Everyday spenders looking for cash back on regular purchases</div>
+</div>

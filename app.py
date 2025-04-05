@@ -1094,9 +1094,36 @@ elif page == "Recommendation System":
                             </div>
                             """, unsafe_allow_html=True)
                             
-                            # Clean up and display similar customers
-                            display_cols = ['Client_No', 'Customer_Age', 'Income', 'Credit_Limit', 'Total_Trans_Amt', 'Total_Trans_Ct']
-                            st.dataframe(similar_customers[display_cols].set_index('Client_No'), use_container_width=True)
+                            # Check available columns and select appropriate ones for display
+                            available_cols = similar_customers.columns.tolist()
+                            display_cols = []
+                            
+                            # Map potential column names to standardized display columns
+                            col_mapping = {
+                                'Client_No': ['Client_No', 'Client_Number', 'client_num', 'client_number'],
+                                'Customer_Age': ['Customer_Age', 'Age', 'age'],
+                                'Income': ['Income', 'Annual_Income', 'income'],
+                                'Credit_Limit': ['Credit_Limit', 'credit_limit'],
+                                'Total_Trans_Amt': ['Total_Trans_Amt', 'Transaction_Amount', 'total_transaction_amount'],
+                                'Total_Trans_Ct': ['Total_Trans_Ct', 'Transaction_Count', 'total_transaction_count']
+                            }
+                            
+                            # Find available columns that match our desired output columns
+                            for display_col, possible_cols in col_mapping.items():
+                                for col in possible_cols:
+                                    if col in available_cols:
+                                        display_cols.append(col)
+                                        break
+                            
+                            # Set index column to the first column if possible, otherwise don't set index
+                            if display_cols:
+                                if display_cols[0] in ['Client_No', 'Client_Number', 'client_num', 'client_number']:
+                                    st.dataframe(similar_customers[display_cols].set_index(display_cols[0]), use_container_width=True)
+                                else:
+                                    st.dataframe(similar_customers[display_cols], use_container_width=True)
+                            else:
+                                # Just display what we have
+                                st.dataframe(similar_customers, use_container_width=True)
                     else:
                         st.error(f"Customer with client number {client_num} not found.")
         
