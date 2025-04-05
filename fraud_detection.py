@@ -105,8 +105,13 @@ class FraudDetectionModel:
         """
         Predict fraud probability for a customer
         """
-        if not self.is_trained:
-            return None
+        if not self.is_trained or self.model is None or self.features is None or self.scaler is None:
+            return {
+                'error': 'Model not ready',
+                'fraud_flag': 0,
+                'fraud_probability': 0,
+                'risk_level': 'Unknown'
+            }
         
         # Check if customer_data is None (customer not found)
         if customer_data is None:
@@ -118,8 +123,14 @@ class FraudDetectionModel:
             }
         
         try:
+            # Initialize empty list for missing features
+            missing_features = []
+            
             # Check if all required features are present
-            missing_features = [f for f in self.features if f not in customer_data]
+            for f in self.features:
+                if f not in customer_data:
+                    missing_features.append(f)
+            
             if missing_features:
                 return {
                     'error': f'Missing features: {missing_features}',
@@ -138,7 +149,13 @@ class FraudDetectionModel:
             prediction = self.model.predict(scaled_features)[0]
             
             # Get fraud probability
-            fraud_probability = self.model.predict_proba(scaled_features)[0][1]
+            proba_result = self.model.predict_proba(scaled_features)[0]
+            
+            # Check if we have at least 2 classes and get the fraud probability (class 1)
+            if len(proba_result) >= 2:
+                fraud_probability = proba_result[1]
+            else:
+                fraud_probability = 0
             
             # Create response
             result = {

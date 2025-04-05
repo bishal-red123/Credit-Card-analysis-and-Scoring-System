@@ -91,8 +91,13 @@ class CreditScoreModel:
         """
         Predict credit score for a customer
         """
-        if not self.is_trained:
-            return None
+        if not self.is_trained or self.model is None or self.features is None or self.scaler is None:
+            return {
+                'error': 'Model not ready',
+                'credit_score_band': 'Unknown',
+                'probability': 0,
+                'all_probabilities': {}
+            }
             
         # Check if customer_data is None (customer not found)
         if customer_data is None:
@@ -104,8 +109,14 @@ class CreditScoreModel:
             }
         
         try:
+            # Initialize empty list for missing features
+            missing_features = []
+            
             # Check if all required features are present
-            missing_features = [f for f in self.features if f not in customer_data]
+            for f in self.features:
+                if f not in customer_data:
+                    missing_features.append(f)
+            
             if missing_features:
                 return {
                     'error': f'Missing features: {missing_features}',
@@ -126,11 +137,17 @@ class CreditScoreModel:
             # Get prediction probabilities
             proba = self.model.predict_proba(scaled_features)[0]
             
+            # Create class-probability dictionary, ensuring classes_ is available
+            if hasattr(self.model, 'classes_') and self.model.classes_ is not None:
+                all_probabilities = dict(zip(self.model.classes_, proba))
+            else:
+                all_probabilities = {}
+            
             # Create response
             result = {
                 'credit_score_band': prediction,
-                'probability': max(proba),
-                'all_probabilities': dict(zip(self.model.classes_, proba))
+                'probability': max(proba) if len(proba) > 0 else 0,
+                'all_probabilities': all_probabilities
             }
             
             return result

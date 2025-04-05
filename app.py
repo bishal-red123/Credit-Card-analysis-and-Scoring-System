@@ -603,6 +603,47 @@ elif page == "Power BI Integration":
             
             st.success("Data exported successfully to 'exports/credit_card_data_for_powerbi.csv'!")
         
+        # Power BI Dashboard File
+        st.write("### Power BI Dashboard File")
+        st.write("""
+        The project includes a ready-to-use Power BI dashboard template that you can download and use with your data:
+        """)
+        
+        # Create columns for the download button and preview image
+        col1, col2 = st.columns([1, 2])
+        
+        with col1:
+            # Check if the dashboard file exists
+            dashboard_path = "attached_assets/Credit Card report.pbix"
+            if os.path.exists(dashboard_path):
+                with open(dashboard_path, "rb") as file:
+                    st.download_button(
+                        label="Download Power BI Dashboard",
+                        data=file,
+                        file_name="Credit Card report.pbix",
+                        mime="application/octet-stream"
+                    )
+            else:
+                st.warning("Power BI dashboard file not found. Please ensure it's in the attached_assets folder.")
+        
+        with col2:
+            # Display a preview image of the dashboard
+            try:
+                st.image("attached_assets/image_1743870402113.png", 
+                         caption="Power BI Dashboard Preview",
+                         use_column_width=True)
+            except:
+                st.info("Dashboard preview image not available.")
+        
+        st.write("""
+        **To use the dashboard:**
+        1. Download the .pbix file above
+        2. Open it in Power BI Desktop
+        3. Click on 'Transform Data' to update the data source
+        4. Point to your exported data file or API endpoint
+        5. Refresh the data to see your own insights
+        """)
+        
         # Power BI Dashboard Examples
         st.write("### Power BI Dashboard Examples")
         
