@@ -93,24 +93,51 @@ class CreditScoreModel:
         """
         if not self.is_trained:
             return None
+            
+        # Check if customer_data is None (customer not found)
+        if customer_data is None:
+            return {
+                'error': 'Customer not found',
+                'credit_score_band': 'Unknown',
+                'probability': 0,
+                'all_probabilities': {}
+            }
         
-        # Extract features
-        features = customer_data[self.features].values.reshape(1, -1)
-        
-        # Scale the features
-        scaled_features = self.scaler.transform(features)
-        
-        # Make prediction
-        prediction = self.model.predict(scaled_features)[0]
-        
-        # Get prediction probabilities
-        proba = self.model.predict_proba(scaled_features)[0]
-        
-        # Create response
-        result = {
-            'credit_score_band': prediction,
-            'probability': max(proba),
-            'all_probabilities': dict(zip(self.model.classes_, proba))
-        }
-        
-        return result
+        try:
+            # Check if all required features are present
+            missing_features = [f for f in self.features if f not in customer_data]
+            if missing_features:
+                return {
+                    'error': f'Missing features: {missing_features}',
+                    'credit_score_band': 'Unknown',
+                    'probability': 0,
+                    'all_probabilities': {}
+                }
+                
+            # Extract features
+            features = customer_data[self.features].values.reshape(1, -1)
+            
+            # Scale the features
+            scaled_features = self.scaler.transform(features)
+            
+            # Make prediction
+            prediction = self.model.predict(scaled_features)[0]
+            
+            # Get prediction probabilities
+            proba = self.model.predict_proba(scaled_features)[0]
+            
+            # Create response
+            result = {
+                'credit_score_band': prediction,
+                'probability': max(proba),
+                'all_probabilities': dict(zip(self.model.classes_, proba))
+            }
+            
+            return result
+        except Exception as e:
+            return {
+                'error': f'Prediction error: {str(e)}',
+                'credit_score_band': 'Unknown',
+                'probability': 0,
+                'all_probabilities': {}
+            }

@@ -6,6 +6,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import threading
 import time
+import os
 import json
 import requests
 
@@ -246,9 +247,16 @@ elif page == "Credit Scoring":
         if st.button("Get Credit Score"):
             customer = data_processing.get_customer_profile(st.session_state.data, client_num)
             
-            if customer is not None:
-                # Get credit score prediction
-                prediction = st.session_state.credit_model.predict(customer)
+            # Get credit score prediction (the model will handle None values)
+            prediction = st.session_state.credit_model.predict(customer)
+            
+            # Check if there was an error in prediction
+            if 'error' in prediction:
+                st.error(prediction['error'])
+            elif customer is None:
+                st.error(f"Customer with client number {client_num} not found.")
+            else:
+                # Customer found and no errors in prediction
                 
                 # Display customer information
                 st.write("#### Customer Information")
@@ -292,8 +300,6 @@ elif page == "Credit Scoring":
                 )
                 
                 st.plotly_chart(fig, use_container_width=True)
-            else:
-                st.error("Customer not found. Please enter a valid client number.")
 
 # Fraud Detection page
 elif page == "Fraud Detection":
@@ -347,10 +353,15 @@ elif page == "Fraud Detection":
         if st.button("Check Fraud Risk"):
             customer = data_processing.get_customer_profile(st.session_state.data, client_num)
             
-            if customer is not None:
-                # Get fraud prediction
-                prediction = st.session_state.fraud_model.predict(customer)
-                
+            # Get fraud prediction (the model handles None values)
+            prediction = st.session_state.fraud_model.predict(customer)
+            
+            # Check if there was an error in prediction
+            if 'error' in prediction:
+                st.error(prediction['error'])
+            elif customer is None:
+                st.error(f"Customer with client number {client_num} not found.")
+            else:
                 # Display customer information
                 st.write("#### Customer Information")
                 col1, col2, col3 = st.columns(3)
@@ -406,8 +417,6 @@ elif page == "Fraud Detection":
                 
                 if recent_transactions is not None:
                     st.dataframe(recent_transactions[['Week_Start_Date', 'Total_Trans_Amt', 'Total_Trans_Ct', 'Exp_Type']])
-            else:
-                st.error("Customer not found. Please enter a valid client number.")
 
 # Customer Analysis page
 elif page == "Customer Analysis":

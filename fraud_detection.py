@@ -108,23 +108,50 @@ class FraudDetectionModel:
         if not self.is_trained:
             return None
         
-        # Extract features
-        features = customer_data[self.features].values.reshape(1, -1)
+        # Check if customer_data is None (customer not found)
+        if customer_data is None:
+            return {
+                'error': 'Customer not found',
+                'fraud_flag': 0,
+                'fraud_probability': 0,
+                'risk_level': 'Unknown'
+            }
         
-        # Scale the features
-        scaled_features = self.scaler.transform(features)
-        
-        # Make prediction
-        prediction = self.model.predict(scaled_features)[0]
-        
-        # Get fraud probability
-        fraud_probability = self.model.predict_proba(scaled_features)[0][1]
-        
-        # Create response
-        result = {
-            'fraud_flag': int(prediction),
-            'fraud_probability': fraud_probability,
-            'risk_level': 'High' if fraud_probability > 0.7 else 'Medium' if fraud_probability > 0.3 else 'Low'
-        }
-        
-        return result
+        try:
+            # Check if all required features are present
+            missing_features = [f for f in self.features if f not in customer_data]
+            if missing_features:
+                return {
+                    'error': f'Missing features: {missing_features}',
+                    'fraud_flag': 0,
+                    'fraud_probability': 0,
+                    'risk_level': 'Unknown'
+                }
+                
+            # Extract features
+            features = customer_data[self.features].values.reshape(1, -1)
+            
+            # Scale the features
+            scaled_features = self.scaler.transform(features)
+            
+            # Make prediction
+            prediction = self.model.predict(scaled_features)[0]
+            
+            # Get fraud probability
+            fraud_probability = self.model.predict_proba(scaled_features)[0][1]
+            
+            # Create response
+            result = {
+                'fraud_flag': int(prediction),
+                'fraud_probability': fraud_probability,
+                'risk_level': 'High' if fraud_probability > 0.7 else 'Medium' if fraud_probability > 0.3 else 'Low'
+            }
+            
+            return result
+        except Exception as e:
+            return {
+                'error': f'Prediction error: {str(e)}',
+                'fraud_flag': 0,
+                'fraud_probability': 0,
+                'risk_level': 'Unknown'
+            }
