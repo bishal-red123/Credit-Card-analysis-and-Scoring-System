@@ -17,6 +17,7 @@ import data_processing
 import credit_scoring
 import fraud_detection
 import visualization
+import recommendation_system
 import api
 
 # Set page configuration first (must be at the top)
@@ -57,6 +58,8 @@ if 'credit_model' not in st.session_state:
     st.session_state.credit_model = credit_scoring.CreditScoreModel()
 if 'fraud_model' not in st.session_state:
     st.session_state.fraud_model = fraud_detection.FraudDetectionModel()
+if 'recommender_model' not in st.session_state:
+    st.session_state.recommender_model = recommendation_system.CreditCardRecommender()
 if 'credit_evaluation' not in st.session_state:
     st.session_state.credit_evaluation = None
 if 'fraud_evaluation' not in st.session_state:
@@ -232,7 +235,7 @@ st.sidebar.markdown("""
 """, unsafe_allow_html=True)
 
 st.sidebar.title("Navigation")
-page = st.sidebar.radio("", ["Home", "Data Exploration", "Credit Scoring", "Fraud Detection", "Customer Analysis"])
+page = st.sidebar.radio("", ["Home", "Data Exploration", "Credit Scoring", "Fraud Detection", "Customer Analysis", "Recommendation System"])
 
 # Add user status to sidebar
 st.sidebar.markdown("---")
@@ -949,6 +952,265 @@ elif page == "Customer Analysis":
                             st.info("No customers found with the selected filters.")
                     except Exception as e:
                         st.error(f"Error displaying results: {str(e)}")
+
+# Recommendation System page
+elif page == "Recommendation System":
+    st.write("## Credit Card Recommendation System")
+    
+    # Check if data is loaded
+    if st.session_state.data is None:
+        st.warning("Please load the data first.")
+        if st.button("Load Data"):
+            load_data()
+    else:
+        # Create or load the recommender model if not already loaded
+        if not hasattr(st.session_state.recommender_model, 'credit_card_data') or st.session_state.recommender_model.credit_card_data is None:
+            with st.spinner("Initializing recommendation system..."):
+                if not st.session_state.recommender_model.load_model():
+                    # Train the model with processed data
+                    st.session_state.recommender_model.train({'processed_data': st.session_state.data})
+                    st.success("Recommendation system initialized successfully!")
+        
+        # Introduction section with modern UI
+        st.markdown("""
+        <div style="background: linear-gradient(90deg, rgba(26, 31, 42, 0.8), rgba(26, 31, 42, 0.4), rgba(26, 31, 42, 0.8)); 
+                    padding: 20px; border-radius: 10px; margin-bottom: 30px; position: relative; overflow: hidden; 
+                    border: 1px solid rgba(119, 146, 227, 0.3);">
+            <div style="position: relative; z-index: 2;">
+                <h3 style="color: white; margin-top: 0;">Personalized Credit Card Recommendations</h3>
+                <p style="color: #B8C2E0; font-size: 1rem;">
+                    Our AI-powered recommendation system analyzes customer profiles to suggest the most suitable 
+                    credit card offerings based on income, spending patterns, and credit history.
+                </p>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Two options: search by client number or manually enter profile
+        tab1, tab2 = st.tabs(["Find by Client Number", "Custom Profile"])
+        
+        with tab1:
+            st.write("### Get Recommendations for Existing Customer")
+            client_num = st.number_input("Enter Client Number", min_value=1, step=1)
+            
+            if st.button("Get Card Recommendations", key="client_recommendations"):
+                with st.spinner("Analyzing customer profile..."):
+                    # Get customer data
+                    customer = data_processing.get_customer_profile(st.session_state.data, client_num)
+                    
+                    if customer is not None:
+                        # Get credit score if not already present
+                        if 'credit_score' not in customer:
+                            credit_prediction = st.session_state.credit_model.predict(customer)
+                            customer['credit_score'] = credit_prediction.get('credit_score_numeric', 650)
+                        
+                        # Get recommendations
+                        recommendations = st.session_state.recommender_model.recommend_cards(customer)
+                        
+                        # Get user segment
+                        user_segment = st.session_state.recommender_model.get_user_segment(customer)
+                        
+                        # Display customer profile overview
+                        st.markdown(f"""
+                        <div style="background: rgba(26, 31, 42, 0.6); padding: 20px; border-radius: 10px; margin: 20px 0;">
+                            <h4 style="color: white; margin-top: 0;">Customer Profile Overview</h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                                <div style="flex: 1; min-width: 120px;">
+                                    <div style="font-size: 0.8rem; color: #B8C2E0;">Client Number</div>
+                                    <div style="font-size: 1.1rem; color: white; font-weight: 600;">{client_num}</div>
+                                </div>
+                                <div style="flex: 1; min-width: 120px;">
+                                    <div style="font-size: 0.8rem; color: #B8C2E0;">User Segment</div>
+                                    <div style="font-size: 1.1rem; color: white; font-weight: 600; text-transform: capitalize;">{user_segment}</div>
+                                </div>
+                                <div style="flex: 1; min-width: 120px;">
+                                    <div style="font-size: 0.8rem; color: #B8C2E0;">Income</div>
+                                    <div style="font-size: 1.1rem; color: white; font-weight: 600;">${customer['Income']:,.2f}</div>
+                                </div>
+                                <div style="flex: 1; min-width: 120px;">
+                                    <div style="font-size: 0.8rem; color: #B8C2E0;">Credit Score</div>
+                                    <div style="font-size: 1.1rem; color: white; font-weight: 600;">{customer['credit_score']}</div>
+                                </div>
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        
+                        # Display recommendations
+                        st.markdown("### Recommended Credit Cards")
+                        
+                        for i, card in enumerate(recommendations):
+                            match_score_color = "#4CAF50" if card['match_score'] >= 80 else "#FFC107" if card['match_score'] >= 60 else "#F44336"
+                            
+                            st.markdown(f"""
+                            <div style="background: rgba(26, 31, 42, 0.6); padding: 20px; border-radius: 10px; margin-bottom: 15px; 
+                                       border-left: 3px solid {match_score_color};">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                    <h4 style="color: white; margin: 0;">{card['name']}</h4>
+                                    <div style="background: linear-gradient(45deg, #1A1F2A, {match_score_color}); padding: 5px 10px; border-radius: 15px;">
+                                        <span style="color: white; font-weight: 600;">{card['match_score']:.0f}% Match</span>
+                                    </div>
+                                </div>
+                                
+                                <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 15px;">
+                                    <div style="flex: 1; min-width: 120px;">
+                                        <div style="font-size: 0.8rem; color: #B8C2E0;">Annual Fee</div>
+                                        <div style="font-size: 1rem; color: white;">${card['annual_fee']}</div>
+                                    </div>
+                                    <div style="flex: 1; min-width: 120px;">
+                                        <div style="font-size: 0.8rem; color: #B8C2E0;">Rewards Rate</div>
+                                        <div style="font-size: 1rem; color: white;">{card['rewards_rate']*100:.1f}%</div>
+                                    </div>
+                                    <div style="flex: 1; min-width: 120px;">
+                                        <div style="font-size: 0.8rem; color: #B8C2E0;">Intro APR</div>
+                                        <div style="font-size: 1rem; color: white;">{card['intro_apr']}</div>
+                                    </div>
+                                    <div style="flex: 1; min-width: 120px;">
+                                        <div style="font-size: 0.8rem; color: #B8C2E0;">Foreign Transaction Fee</div>
+                                        <div style="font-size: 1rem; color: white;">{card['foreign_transaction_fee']*100:.1f}%</div>
+                                    </div>
+                                </div>
+                                
+                                <div style="margin-bottom: 15px;">
+                                    <div style="font-size: 0.8rem; color: #B8C2E0; margin-bottom: 5px;">Benefits</div>
+                                    <ul style="color: white; margin: 0; padding-left: 20px;">
+                                        {' '.join(['<li>' + benefit + '</li>' for benefit in card['benefits']])}
+                                    </ul>
+                                </div>
+                                
+                                <div>
+                                    <div style="font-size: 0.8rem; color: #B8C2E0; margin-bottom: 5px;">Ideal For</div>
+                                    <div style="color: white; font-style: italic;">{card['ideal_for']}</div>
+                                </div>
+                            </div>
+                            """, unsafe_allow_html=True)
+                        
+                        # Get similar customers
+                        similar_customers = st.session_state.recommender_model.get_similar_customers(customer)
+                        if similar_customers is not None and not similar_customers.empty:
+                            st.markdown("### Similar Customer Profiles")
+                            st.markdown("""
+                            <div style="font-size: 0.9rem; color: #B8C2E0; margin-bottom: 15px;">
+                                The following customers have similar financial profiles and may have similar credit needs:
+                            </div>
+                            """, unsafe_allow_html=True)
+                            
+                            # Clean up and display similar customers
+                            display_cols = ['Client_No', 'Customer_Age', 'Income', 'Credit_Limit', 'Total_Trans_Amt', 'Total_Trans_Ct']
+                            st.dataframe(similar_customers[display_cols].set_index('Client_No'), use_container_width=True)
+                    else:
+                        st.error(f"Customer with client number {client_num} not found.")
+        
+        with tab2:
+            st.write("### Create Custom Profile for Recommendations")
+            
+            # Create form for custom profile input
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                custom_age = st.slider("Age", 18, 80, 35)
+                custom_income = st.number_input("Annual Income ($)", min_value=15000, max_value=250000, value=60000, step=5000)
+                custom_credit_score = st.slider("Credit Score", 300, 850, 680)
+            
+            with col2:
+                custom_revolving_balance = st.number_input("Revolving Balance ($)", min_value=0, max_value=50000, value=2000, step=500)
+                custom_transaction_amount = st.number_input("Monthly Transaction Amount ($)", min_value=0, max_value=20000, value=3000, step=500)
+                custom_transaction_count = st.slider("Monthly Transaction Count", 0, 200, 40)
+            
+            # Get credit limit based on income (rough estimate)
+            custom_credit_limit = min(custom_income * 0.3, 30000)
+            
+            # Calculate utilization ratio
+            if custom_credit_limit > 0:
+                custom_utilization = custom_revolving_balance / custom_credit_limit
+            else:
+                custom_utilization = 0
+            
+            # Display estimated credit limit and utilization
+            st.info(f"Estimated Credit Limit: ${custom_credit_limit:,.2f} | Utilization Ratio: {custom_utilization:.2%}")
+            
+            if st.button("Get Card Recommendations", key="custom_recommendations"):
+                with st.spinner("Generating personalized recommendations..."):
+                    # Create custom customer profile
+                    custom_profile = {
+                        'Customer_Age': custom_age,
+                        'Income': custom_income,
+                        'Credit_Limit': custom_credit_limit,
+                        'Total_Revolving_Bal': custom_revolving_balance,
+                        'Total_Trans_Amt': custom_transaction_amount,
+                        'Total_Trans_Ct': custom_transaction_count,
+                        'Avg_Utilization_Ratio': custom_utilization,
+                        'credit_score': custom_credit_score
+                    }
+                    
+                    # Get recommendations
+                    recommendations = st.session_state.recommender_model.recommend_cards(custom_profile)
+                    
+                    # Get user segment
+                    user_segment = st.session_state.recommender_model.get_user_segment(custom_profile)
+                    
+                    # Display user segment with nice UI
+                    segment_color = "#4CAF50" if user_segment == "premium" else "#FFC107" if user_segment == "standard" else "#F44336"
+                    st.markdown(f"""
+                    <div style="background: rgba(26, 31, 42, 0.6); padding: 20px; border-radius: 10px; margin: 20px 0;">
+                        <h4 style="color: white; margin-top: 0;">Custom Profile Analysis</h4>
+                        <div style="margin: 15px 0;">
+                            <div style="font-size: 0.8rem; color: #B8C2E0; margin-bottom: 5px;">User Segment</div>
+                            <div style="display: inline-block; background: linear-gradient(45deg, #1A1F2A, {segment_color}); 
+                                     padding: 8px 15px; border-radius: 20px; text-transform: capitalize;">
+                                <span style="color: white; font-weight: 600; font-size: 1.1rem;">{user_segment}</span>
+                            </div>
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    # Display recommendations
+                    st.markdown("### Recommended Credit Cards")
+                    
+                    for i, card in enumerate(recommendations):
+                        match_score_color = "#4CAF50" if card['match_score'] >= 80 else "#FFC107" if card['match_score'] >= 60 else "#F44336"
+                        
+                        st.markdown(f"""
+                        <div style="background: rgba(26, 31, 42, 0.6); padding: 20px; border-radius: 10px; margin-bottom: 15px; 
+                                   border-left: 3px solid {match_score_color};">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <h4 style="color: white; margin: 0;">{card['name']}</h4>
+                                <div style="background: linear-gradient(45deg, #1A1F2A, {match_score_color}); padding: 5px 10px; border-radius: 15px;">
+                                    <span style="color: white; font-weight: 600;">{card['match_score']:.0f}% Match</span>
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 15px;">
+                                <div style="flex: 1; min-width: 120px;">
+                                    <div style="font-size: 0.8rem; color: #B8C2E0;">Annual Fee</div>
+                                    <div style="font-size: 1rem; color: white;">${card['annual_fee']}</div>
+                                </div>
+                                <div style="flex: 1; min-width: 120px;">
+                                    <div style="font-size: 0.8rem; color: #B8C2E0;">Rewards Rate</div>
+                                    <div style="font-size: 1rem; color: white;">{card['rewards_rate']*100:.1f}%</div>
+                                </div>
+                                <div style="flex: 1; min-width: 120px;">
+                                    <div style="font-size: 0.8rem; color: #B8C2E0;">Intro APR</div>
+                                    <div style="font-size: 1rem; color: white;">{card['intro_apr']}</div>
+                                </div>
+                                <div style="flex: 1; min-width: 120px;">
+                                    <div style="font-size: 0.8rem; color: #B8C2E0;">Foreign Transaction Fee</div>
+                                    <div style="font-size: 1rem; color: white;">{card['foreign_transaction_fee']*100:.1f}%</div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-bottom: 15px;">
+                                <div style="font-size: 0.8rem; color: #B8C2E0; margin-bottom: 5px;">Benefits</div>
+                                <ul style="color: white; margin: 0; padding-left: 20px;">
+                                    {' '.join(['<li>' + benefit + '</li>' for benefit in card['benefits']])}
+                                </ul>
+                            </div>
+                            
+                            <div>
+                                <div style="font-size: 0.8rem; color: #B8C2E0; margin-bottom: 5px;">Ideal For</div>
+                                <div style="color: white; font-style: italic;">{card['ideal_for']}</div>
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     # Display footer
