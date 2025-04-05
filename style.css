@@ -1,54 +1,106 @@
-/* Futuristic UI Styling for Credit Scoring & Fraud Detection System */
+/* Enhanced Futuristic UI Styling for Credit Scoring & Fraud Detection System */
 
 /* Main container styles */
 .main .block-container {
     padding-top: 2rem;
     padding-bottom: 2rem;
+    max-width: 1200px;
 }
 
-/* Header styles */
-h1, h2, h3 {
-    background: linear-gradient(90deg, #7792E3, #5F67EA);
+/* Add a subtle background effect */
+html, body, [data-testid="stAppViewContainer"] {
+    background-color: #0E1117;
+    background-image: 
+        radial-gradient(circle at 25% 25%, rgba(45, 55, 72, 0.2) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(66, 99, 235, 0.1) 0%, transparent 50%);
+    background-attachment: fixed;
+}
+
+/* Header styles with enhanced gradients */
+h1, h2, h3, h4, h5, h6 {
+    background: linear-gradient(90deg, #7792E3, #5F67EA, #4752E9);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: 700;
-    letter-spacing: -0.05em;
+    letter-spacing: -0.03em;
     margin-bottom: 1.5rem;
+    text-shadow: 0px 2px 10px rgba(119, 146, 227, 0.2);
 }
 
 h1 {
-    font-size: 2.5rem;
+    font-size: 2.8rem;
     border-bottom: 1px solid rgba(119, 146, 227, 0.2);
-    padding-bottom: 0.75rem;
+    padding-bottom: 1rem;
+    position: relative;
+}
+
+h1::after {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100px;
+    height: 3px;
+    background: linear-gradient(90deg, #7792E3, #5F67EA);
+    border-radius: 3px;
 }
 
 h2 {
-    font-size: 1.8rem;
+    font-size: 2rem;
+    position: relative;
+    display: inline-block;
+}
+
+h2::after {
+    content: "";
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 60%;
+    height: 2px;
+    background: linear-gradient(90deg, #7792E3, transparent);
+    border-radius: 2px;
 }
 
 h3 {
-    font-size: 1.3rem;
+    font-size: 1.5rem;
 }
 
-/* Card-like sections */
+/* Card-like sections with glass morphism */
 [data-testid="stSidebar"] {
-    background-color: rgba(26, 31, 42, 0.8);
+    background-color: rgba(18, 24, 36, 0.8);
     backdrop-filter: blur(10px);
     border-right: 1px solid rgba(119, 146, 227, 0.2);
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
 }
 
-/* Make metric displays more futuristic */
+/* Enhanced metric displays with glossy effect */
 [data-testid="stMetric"] {
-    background: rgba(26, 31, 42, 0.6);
-    border-radius: 10px;
-    padding: 1rem;
+    background: rgba(26, 31, 42, 0.7);
+    border-radius: 12px;
+    padding: 1.2rem;
     border-left: 3px solid #7792E3;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    position: relative;
+    overflow: hidden;
+}
+
+[data-testid="stMetric"]::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+    pointer-events: none;
 }
 
 [data-testid="stMetric"]:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
 /* Style metric labels */
@@ -57,42 +109,66 @@ h3 {
     font-size: 0.9rem !important;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    font-weight: 600 !important;
 }
 
 /* Style metric values */
 [data-testid="stMetricValue"] {
-    font-size: 1.4rem !important;
+    font-size: 1.6rem !important;
     font-weight: 700 !important;
 }
 
-/* Button styling */
+/* Beautiful button styling with glow effect */
 .stButton > button {
-    background: linear-gradient(90deg, #7792E3, #5F67EA);
+    background: linear-gradient(135deg, #7792E3, #5F67EA);
     color: white;
     border: none;
     border-radius: 50px;
-    padding: 0.5rem 2rem;
+    padding: 0.6rem 2.5rem;
     font-weight: 600;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(119, 146, 227, 0.3);
+    box-shadow: 0 4px 15px rgba(119, 146, 227, 0.4);
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.03em;
 }
 
 .stButton > button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(119, 146, 227, 0.5);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(119, 146, 227, 0.6);
 }
 
-/* Tabs styling */
+.stButton > button::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    transform: scale(0.5);
+}
+
+.stButton > button:hover::after {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Tabs styling - sleeker and more modern */
 .stTabs [data-baseweb="tab-list"] {
-    gap: 2px;
-    border-radius: 10px;
+    gap: 3px;
+    border-radius: 12px;
     overflow: hidden;
-    background-color: #1A1F2A;
+    background-color: rgba(18, 24, 36, 0.6);
+    border: 1px solid rgba(119, 146, 227, 0.15);
+    padding: 3px;
 }
 
 .stTabs [data-baseweb="tab"] {
-    padding: 10px 24px;
-    border-radius: 0;
+    padding: 12px 24px;
+    border-radius: 8px;
     border: none;
     background-color: transparent;
     color: #B8C2E0;
@@ -101,46 +177,145 @@ h3 {
 }
 
 .stTabs [aria-selected="true"] {
-    background-color: #7792E3 !important;
+    background: linear-gradient(135deg, #7792E3, #5F67EA) !important;
     color: white !important;
+    box-shadow: 0 4px 12px rgba(119, 146, 227, 0.3);
 }
 
-/* Tables and dataframes */
+/* Tables and dataframes with modern styling */
 [data-testid="stTable"], [data-testid="stDataFrame"] {
-    border-radius: 10px;
-    overflow: hidden;
-    border: 1px solid rgba(119, 146, 227, 0.2);
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    border: 1px solid rgba(119, 146, 227, 0.2) !important;
+    background: rgba(26, 31, 42, 0.5) !important;
 }
 
-/* Add some animations */
+[data-testid="stTable"] th, [data-testid="stDataFrame"] th {
+    background: rgba(18, 24, 36, 0.8) !important;
+    color: #B8C2E0 !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.03em !important;
+    font-size: 0.85rem !important;
+    padding: 12px 24px !important;
+    border-bottom: 1px solid rgba(119, 146, 227, 0.2) !important;
+}
+
+[data-testid="stTable"] td, [data-testid="stDataFrame"] td {
+    font-size: 0.9rem !important;
+    padding: 10px 24px !important;
+    border-bottom: 1px solid rgba(119, 146, 227, 0.1) !important;
+}
+
+/* Smooth animations for better UX */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
 .main .element-container {
-    animation: fadeIn 0.5s ease forwards;
+    animation: fadeIn 0.6s ease forwards;
 }
 
-/* Custom spinner for loading states */
+/* Custom spinner with glow effect */
 .stSpinner > div {
-    border-color: #7792E3 !important;
+    border-color: #7792E3 transparent #7792E3 transparent !important;
+    filter: drop-shadow(0 0 3px rgba(119, 146, 227, 0.5));
 }
 
-/* Code block styling */
+/* Code block styling with enhanced readability */
 .stCodeBlock {
-    border-radius: 8px;
-    border: 1px solid rgba(119, 146, 227, 0.2);
+    border-radius: 10px !important;
+    border: 1px solid rgba(119, 146, 227, 0.2) !important;
+    background: rgba(18, 24, 36, 0.8) !important;
 }
 
-/* Add a subtle glow to inputs */
+/* Add a subtle glow to inputs for better focus states */
 input, select, textarea {
-    border-radius: 6px !important;
+    border-radius: 8px !important;
     border-color: rgba(119, 146, 227, 0.3) !important;
     box-shadow: 0 0 5px rgba(119, 146, 227, 0.1) !important;
+    background-color: rgba(26, 31, 42, 0.8) !important;
+    color: #E0E5F2 !important;
+    padding: 8px 12px !important;
 }
 
 input:focus, select:focus, textarea:focus {
     border-color: #7792E3 !important;
-    box-shadow: 0 0 8px rgba(119, 146, 227, 0.3) !important;
+    box-shadow: 0 0 12px rgba(119, 146, 227, 0.3) !important;
+}
+
+/* Selectbox styling */
+[data-baseweb="select"] {
+    background-color: rgba(26, 31, 42, 0.8) !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(119, 146, 227, 0.3) !important;
+}
+
+[data-baseweb="select"]:focus-within {
+    border-color: #7792E3 !important;
+    box-shadow: 0 0 12px rgba(119, 146, 227, 0.3) !important;
+}
+
+/* Slider styling */
+[data-testid="stSlider"] > div {
+    background-color: rgba(26, 31, 42, 0.8) !important;
+    border-radius: 8px !important;
+    padding: 20px !important;
+    border: 1px solid rgba(119, 146, 227, 0.2) !important;
+}
+
+[data-testid="stSlider"] .rc-slider-track {
+    background-color: #7792E3 !important;
+}
+
+[data-testid="stSlider"] .rc-slider-handle {
+    border-color: #7792E3 !important;
+    box-shadow: 0 0 5px rgba(119, 146, 227, 0.5) !important;
+}
+
+/* Container styling */
+[data-testid="stVerticalBlock"] > div > div {
+    gap: 20px;
+}
+
+/* Improve readability of base text */
+p, div, span, label {
+    color: #E0E5F2 !important;
+}
+
+/* Beautiful scrollbars */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(26, 31, 42, 0.6);
+}
+
+::-webkit-scrollbar-thumb {
+    background: #7792E3;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #5F67EA;
+}
+
+/* Streamlit expander styling */
+.streamlit-expanderHeader {
+    font-weight: 600 !important;
+    font-size: 1.1rem !important;
+    color: #B8C2E0 !important;
+    background-color: rgba(26, 31, 42, 0.8) !important;
+    border-radius: 8px !important;
+    padding: 12px 16px !important;
+    border-left: 3px solid #7792E3 !important;
+}
+
+.streamlit-expanderContent {
+    background-color: rgba(18, 24, 36, 0.5) !important;
+    border-radius: 0 0 8px 8px !important;
+    padding: 20px !important;
 }

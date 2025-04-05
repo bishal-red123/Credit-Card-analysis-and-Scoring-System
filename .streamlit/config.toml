@@ -4,9 +4,8 @@ address = "0.0.0.0"
 port = 5000
 
 [theme]
-# A modern, futuristic dark theme
-primaryColor = "#7792E3"  # Bright blue accent
-backgroundColor = "#0E1117"  # Deep space dark background
-secondaryBackgroundColor = "#1A1F2A"  # Slightly lighter panels
-textColor = "#F0F2F6"  # Crisp white text
+primaryColor = "#7792E3"
+backgroundColor = "#0E1117"
+secondaryBackgroundColor = "#1A1F2A"
+textColor = "#E0E5F2"
 font = "sans serif"

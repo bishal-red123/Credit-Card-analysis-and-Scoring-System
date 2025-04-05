@@ -39,11 +39,15 @@ def add_animated_bg():
         background: linear-gradient(
             -45deg, 
             rgba(14, 17, 23, 1) 0%, 
-            rgba(14, 17, 23, 0.95) 50%, 
-            rgba(26, 31, 42, 0.8) 100%
+            rgba(18, 24, 36, 0.98) 25%, 
+            rgba(22, 31, 48, 0.95) 50%,
+            rgba(26, 31, 42, 0.9) 75%, 
+            rgba(14, 17, 23, 1) 100%
         );
         background-size: 400% 400%;
-        animation: gradient 15s ease infinite;
+        animation: gradient 18s ease infinite;
+        position: relative;
+        overflow: hidden;
     }
     
     @keyframes gradient {
@@ -58,7 +62,7 @@ def add_animated_bg():
         }
     }
     
-    /* Add glowing dots in the background */
+    /* Add enhanced glowing elements in the background */
     .stApp::before {
         content: "";
         position: absolute;
@@ -67,11 +71,108 @@ def add_animated_bg():
         width: 100%;
         height: 100%;
         z-index: -1;
-        background-image: radial-gradient(#7792E3 1px, transparent 1px),
-                          radial-gradient(#7792E3 1px, transparent 1px);
+        background-image: 
+            radial-gradient(#7792E3 1px, transparent 1px),
+            radial-gradient(#5F67EA 1px, transparent 1px);
         background-size: 50px 50px;
         background-position: 0 0, 25px 25px;
         opacity: 0.1;
+        animation: pulse 8s infinite ease-in-out;
+    }
+    
+    /* Add a second layer of particles */
+    .stApp::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        background: 
+            radial-gradient(circle at 20% 30%, rgba(119, 146, 227, 0.1) 0%, transparent 12%),
+            radial-gradient(circle at 80% 20%, rgba(95, 103, 234, 0.07) 0%, transparent 15%),
+            radial-gradient(circle at 40% 80%, rgba(71, 82, 233, 0.08) 0%, transparent 18%),
+            radial-gradient(circle at 85% 70%, rgba(119, 146, 227, 0.06) 0%, transparent 20%);
+        animation: shimmer 12s infinite ease-in-out;
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 0.05; }
+        50% { opacity: 0.15; }
+        100% { opacity: 0.05; }
+    }
+    
+    @keyframes shimmer {
+        0% { background-position: 0% 0%; }
+        50% { background-position: 100% 100%; }
+        100% { background-position: 0% 0%; }
+    }
+    
+    /* Add floating particles with glowing effect */
+    .particle {
+        position: fixed;
+        background: linear-gradient(180deg, #7792E3, #5F67EA);
+        border-radius: 50%;
+        filter: blur(5px);
+        opacity: 0;
+        z-index: -2;
+        pointer-events: none;
+        animation: float-up var(--duration) ease-in-out infinite;
+        animation-delay: var(--delay);
+    }
+    
+    @keyframes float-up {
+        0% { transform: translateY(20px); opacity: 0; }
+        20% { opacity: 0.6; }
+        80% { opacity: 0.6; }
+        100% { transform: translateY(-100px); opacity: 0; }
+    }
+    
+    /* Create particles with different sizes and positions */
+    .particle-1 {
+        width: 10px;
+        height: 10px;
+        bottom: 10%;
+        left: 10%;
+        --duration: 15s;
+        --delay: 0s;
+    }
+    
+    .particle-2 {
+        width: 15px;
+        height: 15px;
+        bottom: 20%;
+        left: 25%;
+        --duration: 18s;
+        --delay: 2s;
+    }
+    
+    .particle-3 {
+        width: 8px;
+        height: 8px;
+        bottom: 30%;
+        left: 50%;
+        --duration: 12s;
+        --delay: 4s;
+    }
+    
+    .particle-4 {
+        width: 12px;
+        height: 12px;
+        bottom: 20%;
+        left: 70%;
+        --duration: 16s;
+        --delay: 6s;
+    }
+    
+    .particle-5 {
+        width: 7px;
+        height: 7px;
+        bottom: 40%;
+        left: 85%;
+        --duration: 14s;
+        --delay: 8s;
     }
     
     /* Futuristic logo animation */
@@ -94,6 +195,13 @@ def add_animated_bg():
         }
     }
     </style>
+    
+    <!-- Animated particles -->
+    <div class="particle particle-1"></div>
+    <div class="particle particle-2"></div>
+    <div class="particle particle-3"></div>
+    <div class="particle particle-4"></div>
+    <div class="particle particle-5"></div>
     """, unsafe_allow_html=True)
 
 # Function to create a dynamic date display
