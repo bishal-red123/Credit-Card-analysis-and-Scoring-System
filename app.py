@@ -820,7 +820,12 @@ elif page == "Fraud Detection":
                 recent_transactions = data_processing.get_recent_transactions(st.session_state.data, client_num)
                 
                 if recent_transactions is not None:
-                    st.dataframe(recent_transactions[['Week_Start_Date', 'Total_Trans_Amt', 'Total_Trans_Ct', 'Exp_Type']])
+                    # Check which columns are available
+                    available_columns = ['Week_Start_Date', 'Total_Trans_Amt', 'Total_Trans_Ct']
+                    # Add Exp_Type if it exists
+                    if 'Exp_Type' in recent_transactions.columns:
+                        available_columns.append('Exp_Type')
+                    st.dataframe(recent_transactions[available_columns])
 
 # Customer Analysis page
 elif page == "Customer Analysis":
@@ -909,7 +914,12 @@ elif page == "Customer Analysis":
                     recent_transactions = data_processing.get_recent_transactions(st.session_state.data, client_num)
                     
                     if recent_transactions is not None:
-                        st.dataframe(recent_transactions[['Week_Start_Date', 'Total_Trans_Amt', 'Total_Trans_Ct', 'Exp_Type']])
+                        # Check which columns are available
+                        available_columns = ['Week_Start_Date', 'Total_Trans_Amt', 'Total_Trans_Ct']
+                        # Add Exp_Type if it exists
+                        if 'Exp_Type' in recent_transactions.columns:
+                            available_columns.append('Exp_Type')
+                        st.dataframe(recent_transactions[available_columns])
                 else:
                     st.error("Customer not found. Please enter a valid client number.")
         
