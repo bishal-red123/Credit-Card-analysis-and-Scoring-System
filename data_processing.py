@@ -45,7 +45,7 @@ def preprocess_data(data):
     data = data.fillna({
         'Total_Revolving_Bal': 0, 
         'Avg_Utilization_Ratio': 0,
-        'Delinquent_Acc_x': 0,
+        'Delinquent_Acc': 0,
         'Personal_loan': 'no'
     })
     
@@ -57,7 +57,7 @@ def preprocess_data(data):
     data.loc[data['Income'] > 50000, 'credit_score'] += 10  # Higher income
     data.loc[data['Total_Revolving_Bal'] < 1000, 'credit_score'] += 10  # Low revolving balance
     data.loc[data['Avg_Utilization_Ratio'] < 0.3, 'credit_score'] += 10  # Low utilization ratio
-    data.loc[data['Delinquent_Acc_x'] == 0, 'credit_score'] += 20  # No delinquent accounts
+    data.loc[data['Delinquent_Acc'] == 0, 'credit_score'] += 20  # No delinquent accounts
     data.loc[data['House_Owner'] == 'yes', 'credit_score'] += 5  # Homeowner
     data.loc[data['Personal_loan'] == 'no', 'credit_score'] += 5  # No personal loans
     data.loc[data['Customer_Age'] > 40, 'credit_score'] += 5  # Mature customer

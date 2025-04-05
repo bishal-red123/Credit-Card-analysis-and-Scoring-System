@@ -230,7 +230,7 @@ def api_export_data():
         export_cols = [
             'Client_Num', 'Customer_Age', 'Gender', 'Income', 'Credit_Limit',
             'Total_Revolving_Bal', 'Total_Trans_Amt', 'Total_Trans_Ct',
-            'Avg_Utilization_Ratio', 'Delinquent_Acc_x', 'credit_score',
+            'Avg_Utilization_Ratio', 'Delinquent_Acc', 'credit_score',
             'credit_score_band', 'fraud_flag'
         ]
         
