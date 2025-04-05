@@ -212,7 +212,14 @@ elif page == "Data Exploration":
 elif page == "Credit Scoring":
     st.write("## Credit Scoring Model")
     
-    if st.session_state.data is None or not st.session_state.credit_model.is_trained:
+    # Check if data is loaded and model is trained with all required components
+    model_ready = (st.session_state.data is not None and 
+                  st.session_state.credit_model.is_trained and
+                  st.session_state.credit_model.model is not None and
+                  st.session_state.credit_model.features is not None and
+                  st.session_state.credit_model.scaler is not None)
+    
+    if not model_ready:
         st.warning("Please load the data and train the models first.")
         if st.button("Load Data and Train Models"):
             load_data()
@@ -305,7 +312,14 @@ elif page == "Credit Scoring":
 elif page == "Fraud Detection":
     st.write("## Fraud Detection Model")
     
-    if st.session_state.data is None or not st.session_state.fraud_model.is_trained:
+    # Check if data is loaded and model is trained with all required components
+    model_ready = (st.session_state.data is not None and 
+                  st.session_state.fraud_model.is_trained and
+                  st.session_state.fraud_model.model is not None and
+                  st.session_state.fraud_model.features is not None and
+                  st.session_state.fraud_model.scaler is not None)
+    
+    if not model_ready:
         st.warning("Please load the data and train the models first.")
         if st.button("Load Data and Train Models"):
             load_data()
@@ -422,9 +436,14 @@ elif page == "Fraud Detection":
 elif page == "Customer Analysis":
     st.write("## Customer Analysis")
     
-    if st.session_state.data is None:
-        st.warning("Please load the data first.")
-        if st.button("Load Data"):
+    # Check if data is loaded and models are trained with all required components
+    models_ready = (st.session_state.data is not None and 
+                   st.session_state.credit_model.is_trained and st.session_state.credit_model.model is not None and
+                   st.session_state.fraud_model.is_trained and st.session_state.fraud_model.model is not None)
+    
+    if not models_ready:
+        st.warning("Please load the data and train the models first.")
+        if st.button("Load Data and Train Models"):
             load_data()
     else:
         # Customer search
@@ -516,50 +535,96 @@ elif page == "Customer Analysis":
                 credit_score = st.selectbox("Credit Score Band", ["All", "Poor", "Fair", "Good", "Excellent"])
             
             if st.button("Search"):
-                # Filter data
-                filtered_data = st.session_state.data.copy()
+                # Check if data is available and process if it exists
+                data_available = st.session_state.data is not None
+                filter_successful = False
+                filtered_data = None  # Initialize outside the block to make it available in the entire scope
                 
-                # Apply filters
-                filtered_data = filtered_data[(filtered_data['Customer_Age'] >= age_range[0]) & (filtered_data['Customer_Age'] <= age_range[1])]
-                filtered_data = filtered_data[(filtered_data['Income'] >= income_range[0]) & (filtered_data['Income'] <= income_range[1])]
-                
-                if gender != "All":
-                    filtered_data = filtered_data[filtered_data['Gender'] == gender]
-                
-                if credit_score != "All":
-                    filtered_data = filtered_data[filtered_data['credit_score_band'] == credit_score]
-                
-                # Display results
-                st.write(f"#### Found {len(filtered_data)} records")
-                
-                if len(filtered_data) > 0:
-                    st.dataframe(filtered_data[['Client_Num', 'Customer_Age', 'Gender', 'Income', 'Credit_Limit', 'credit_score_band', 'fraud_flag']])
-                    
-                    # Display aggregate statistics
-                    st.write("#### Aggregate Statistics for Filtered Customers")
-                    col1, col2, col3 = st.columns(3)
-                    
-                    with col1:
-                        st.metric("Average Age", f"{filtered_data['Customer_Age'].mean():.1f}")
-                        st.metric("Average Income", f"${filtered_data['Income'].mean():,.2f}")
-                    
-                    with col2:
-                        st.metric("Average Credit Limit", f"${filtered_data['Credit_Limit'].mean():,.2f}")
-                        st.metric("Average Revolving Balance", f"${filtered_data['Total_Revolving_Bal'].mean():,.2f}")
-                    
-                    with col3:
-                        st.metric("Fraud Rate", f"{filtered_data['fraud_flag'].mean():.2%}")
-                        st.metric("Average Satisfaction Score", f"{filtered_data['Cust_Satisfaction_Score'].mean():.2f}/5")
+                if not data_available:
+                    st.error("Data not available. Please load the data first.")
                 else:
-                    st.info("No customers found with the selected filters.")
+                    # Filter data
+                    try:
+                        filtered_data = st.session_state.data.copy()
+                        
+                        # Apply filters with error handling
+                        # Age filter
+                        filtered_data = filtered_data[(filtered_data['Customer_Age'] >= age_range[0]) & 
+                                                    (filtered_data['Customer_Age'] <= age_range[1])]
+                        
+                        # Income filter
+                        filtered_data = filtered_data[(filtered_data['Income'] >= income_range[0]) & 
+                                                    (filtered_data['Income'] <= income_range[1])]
+                        
+                        # Gender filter
+                        if gender != "All":
+                            filtered_data = filtered_data[filtered_data['Gender'] == gender]
+                        
+                        # Credit score filter with null handling
+                        if credit_score != "All":
+                            # Handle potential missing values by filtering out nulls first
+                            filtered_data = filtered_data[filtered_data['credit_score_band'].notna()]
+                            filtered_data = filtered_data[filtered_data['credit_score_band'] == credit_score]
+                            
+                        filter_successful = True
+                    except Exception as e:
+                        st.error(f"Error filtering data: {str(e)}")
+                
+                # Display results only if filtering was successful and filtered_data exists
+                if filter_successful and filtered_data is not None:
+                    try:
+                        st.write(f"#### Found {len(filtered_data)} records")
+                        
+                        if len(filtered_data) > 0:
+                            # Select columns to display with error handling
+                            display_cols = ['Client_Num', 'Customer_Age', 'Gender', 'Income', 'Credit_Limit']
+                            
+                            # Add credit_score_band and fraud_flag if they exist
+                            if 'credit_score_band' in filtered_data.columns:
+                                display_cols.append('credit_score_band')
+                            if 'fraud_flag' in filtered_data.columns:
+                                display_cols.append('fraud_flag')
+                                
+                            st.dataframe(filtered_data[display_cols])
+                            
+                            # Display aggregate statistics
+                            st.write("#### Aggregate Statistics for Filtered Customers")
+                            col1, col2, col3 = st.columns(3)
+                            
+                            with col1:
+                                if 'Customer_Age' in filtered_data.columns:
+                                    st.metric("Average Age", f"{filtered_data['Customer_Age'].mean():.1f}")
+                                if 'Income' in filtered_data.columns:
+                                    st.metric("Average Income", f"${filtered_data['Income'].mean():,.2f}")
+                            
+                            with col2:
+                                if 'Credit_Limit' in filtered_data.columns:
+                                    st.metric("Average Credit Limit", f"${filtered_data['Credit_Limit'].mean():,.2f}")
+                                if 'Total_Revolving_Bal' in filtered_data.columns:
+                                    st.metric("Average Revolving Balance", f"${filtered_data['Total_Revolving_Bal'].mean():,.2f}")
+                            
+                            with col3:
+                                if 'fraud_flag' in filtered_data.columns:
+                                    st.metric("Fraud Rate", f"{filtered_data['fraud_flag'].mean():.2%}")
+                                if 'Cust_Satisfaction_Score' in filtered_data.columns:
+                                    st.metric("Average Satisfaction Score", f"{filtered_data['Cust_Satisfaction_Score'].mean():.2f}/5")
+                        else:
+                            st.info("No customers found with the selected filters.")
+                    except Exception as e:
+                        st.error(f"Error displaying results: {str(e)}")
 
 # Power BI Integration page
 elif page == "Power BI Integration":
     st.write("## Power BI Integration")
     
-    if st.session_state.data is None:
-        st.warning("Please load the data first.")
-        if st.button("Load Data"):
+    # Check if data is loaded and models are trained with all required components
+    models_ready = (st.session_state.data is not None and 
+                   st.session_state.credit_model.is_trained and st.session_state.credit_model.model is not None and
+                   st.session_state.fraud_model.is_trained and st.session_state.fraud_model.model is not None)
+    
+    if not models_ready:
+        st.warning("Please load the data and train the models first.")
+        if st.button("Load Data and Train Models"):
             load_data()
     else:
         # Start API
@@ -587,21 +652,34 @@ elif page == "Power BI Integration":
         # Export data for Power BI
         st.write("### Export Data for Power BI")
         if st.button("Export Data"):
-            # Create directory for exports
-            if not os.path.exists('exports'):
-                os.makedirs('exports')
-            
-            # Export data
-            export_cols = [
-                'Client_Num', 'Customer_Age', 'Gender', 'Income', 'Credit_Limit',
-                'Total_Revolving_Bal', 'Total_Trans_Amt', 'Total_Trans_Ct',
-                'Avg_Utilization_Ratio', 'Delinquent_Acc_x', 'credit_score',
-                'credit_score_band', 'fraud_flag'
-            ]
-            
-            st.session_state.data[export_cols].to_csv('exports/credit_card_data_for_powerbi.csv', index=False)
-            
-            st.success("Data exported successfully to 'exports/credit_card_data_for_powerbi.csv'!")
+            try:
+                # Create directory for exports
+                if not os.path.exists('exports'):
+                    os.makedirs('exports')
+                
+                # Export data with error handling
+                export_cols = [
+                    'Client_Num', 'Customer_Age', 'Gender', 'Income', 'Credit_Limit',
+                    'Total_Revolving_Bal', 'Total_Trans_Amt', 'Total_Trans_Ct',
+                    'Avg_Utilization_Ratio'
+                ]
+                
+                # Add optional columns if they exist
+                optional_cols = ['Delinquent_Acc_x', 'credit_score', 'credit_score_band', 'fraud_flag']
+                for col in optional_cols:
+                    if col in st.session_state.data.columns:
+                        export_cols.append(col)
+                
+                # Ensure all columns exist before trying to export
+                available_cols = [col for col in export_cols if col in st.session_state.data.columns]
+                
+                if len(available_cols) > 0:
+                    st.session_state.data[available_cols].to_csv('exports/credit_card_data_for_powerbi.csv', index=False)
+                    st.success("Data exported successfully to 'exports/credit_card_data_for_powerbi.csv'!")
+                else:
+                    st.error("No valid columns found for export. Please ensure the data is properly loaded.")
+            except Exception as e:
+                st.error(f"Error exporting data: {str(e)}")
         
         # Power BI Dashboard File
         st.write("### Power BI Dashboard File")
@@ -674,14 +752,35 @@ elif page == "Power BI Integration":
         
         tab1, tab2, tab3 = st.tabs(["Credit Score Distribution", "Fraud Analysis", "Customer Segments"])
         
+        # Function to safely display a plot with error handling
+        def safe_plot(plot_function, data, error_message="Error generating visualization"):
+            try:
+                figure = plot_function(data)
+                st.plotly_chart(figure, use_container_width=True)
+            except Exception as e:
+                st.error(f"{error_message}: {str(e)}")
+                st.info("This visualization may require specific data columns or preprocessing to display correctly.")
+        
         with tab1:
-            st.plotly_chart(visualization.plot_credit_score_distribution(st.session_state.data), use_container_width=True)
+            safe_plot(
+                visualization.plot_credit_score_distribution, 
+                st.session_state.data,
+                "Error generating credit score distribution"
+            )
         
         with tab2:
-            st.plotly_chart(visualization.plot_fraud_distribution(st.session_state.data), use_container_width=True)
+            safe_plot(
+                visualization.plot_fraud_distribution, 
+                st.session_state.data,
+                "Error generating fraud distribution"
+            )
         
         with tab3:
-            st.plotly_chart(visualization.plot_credit_score_by_age(st.session_state.data), use_container_width=True)
+            safe_plot(
+                visualization.plot_credit_score_by_age, 
+                st.session_state.data,
+                "Error generating credit score by age chart"
+            )
         
         # Power BI connection instructions
         st.write("### Power BI Connection Instructions")
