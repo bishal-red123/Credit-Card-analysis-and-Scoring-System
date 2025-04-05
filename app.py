@@ -1108,12 +1108,9 @@ elif page == "Recommendation System":
                                 'Total_Trans_Ct': ['Total_Trans_Ct', 'Transaction_Count', 'total_transaction_count']
                             }
                             
-                            # Debug output to see available columns
-                            st.write("Debug: Available columns in similar customers data:", available_cols)
-                            
-                            # Just display all columns without trying to extract specific ones or set an index
-                            # This avoids KeyError issues regardless of what columns are actually available
-                            st.dataframe(similar_customers, use_container_width=True)
+                            # Now we can be confident that Client_No exists in the dataframe
+                            # Display all columns in the similar customers dataframe in a nice format
+                            st.dataframe(similar_customers.set_index('Client_No'), use_container_width=True)
                     else:
                         st.error(f"Customer with client number {client_num} not found.")
         

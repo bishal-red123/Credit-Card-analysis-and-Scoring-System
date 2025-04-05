@@ -212,20 +212,41 @@ class CreditCardRecommender:
                 # Use mean value from training data if feature is missing
                 customer_features.append(self.credit_card_data[feature].mean())
         
-        # Scale customer features
-        customer_features_scaled = self.scaler.transform(np.array(customer_features).reshape(1, -1))
-        
-        # Scale all customer data
-        all_customers_scaled = self.scaler.transform(self.credit_card_data[self.features])
-        
-        # Calculate similarity
-        similarities = cosine_similarity(customer_features_scaled, all_customers_scaled)
-        
-        # Get indices of top N similar customers
-        similar_indices = similarities[0].argsort()[::-1][:top_n]
-        
-        # Return similar customers
-        return self.credit_card_data.iloc[similar_indices]
+        try:
+            # Scale customer features
+            customer_features_scaled = self.scaler.transform(np.array(customer_features).reshape(1, -1))
+            
+            # Scale all customer data
+            all_customers_scaled = self.scaler.transform(self.credit_card_data[self.features])
+            
+            # Calculate similarity
+            similarities = cosine_similarity(customer_features_scaled, all_customers_scaled)
+            
+            # Get indices of top N similar customers
+            similar_indices = similarities[0].argsort()[::-1][:top_n]
+            
+            # Get similar customers
+            similar_customers = self.credit_card_data.iloc[similar_indices].copy()
+            
+            # Make sure the client number column exists and is standardized
+            # Add Client_No column if it doesn't exist
+            if 'Client_No' not in similar_customers.columns and 'Client_Number' in similar_customers.columns:
+                similar_customers['Client_No'] = similar_customers['Client_Number']
+            elif 'Client_No' not in similar_customers.columns and 'client_num' in similar_customers.columns:
+                similar_customers['Client_No'] = similar_customers['client_num']
+            elif 'Client_No' not in similar_customers.columns:
+                # Create a synthetic client number if none exists
+                similar_customers['Client_No'] = range(100001, 100001 + len(similar_customers))
+            
+            # Return similar customers with standardized columns
+            return similar_customers
+            
+        except Exception as e:
+            print(f"Error finding similar customers: {str(e)}")
+            # Create a sample dataframe with the most essential columns
+            columns = ['Client_No', 'Customer_Age', 'Income', 'Credit_Limit', 
+                       'Total_Trans_Amt', 'Total_Trans_Ct']
+            return pd.DataFrame(columns=columns)
     
     def recommend_cards(self, customer_data, top_n=3):
         """
