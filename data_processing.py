@@ -41,13 +41,20 @@ def preprocess_data(data):
     # Convert date column to datetime
     data['Week_Start_Date'] = pd.to_datetime(data['Week_Start_Date'], format='%d-%m-%Y', errors='coerce')
     
-    # Handle missing values
-    data = data.fillna({
-        'Total_Revolving_Bal': 0, 
-        'Avg_Utilization_Ratio': 0,
-        'Delinquent_Acc': 0,
-        'Personal_loan': 'no'
-    })
+    # Handle missing values in all columns
+    # Fill numeric columns with 0
+    numeric_cols = data.select_dtypes(include=['number']).columns
+    data[numeric_cols] = data[numeric_cols].fillna(0)
+    
+    # Fill categorical columns with the most common value or a default value
+    categorical_cols = data.select_dtypes(exclude=['number']).columns
+    for col in categorical_cols:
+        if col != 'Week_Start_Date':  # Skip date column
+            most_common = data[col].mode()[0] if not data[col].mode().empty else 'Unknown'
+            data[col] = data[col].fillna(most_common)
+    
+    # Additional specific handling
+    data['Personal_loan'] = data['Personal_loan'].fillna('no')
     
     # Create a target variable for credit scoring based on multiple factors
     # Higher score means better creditworthiness
@@ -116,6 +123,10 @@ def preprocess_data(data):
     X_fraud = data[credit_score_features].copy()
     y_fraud = data['fraud_flag'].copy()
     
+    # Make sure there are no NaN values in X_fraud or X_credit
+    X_credit = X_credit.fillna(0)
+    X_fraud = X_fraud.fillna(0)
+    
     # Standardize the features
     scaler = StandardScaler()
     X_credit_scaled = scaler.fit_transform(X_credit)
@@ -124,6 +135,9 @@ def preprocess_data(data):
     # Convert back to DataFrame to keep column names
     X_credit_scaled = pd.DataFrame(X_credit_scaled, columns=X_credit.columns)
     X_fraud_scaled = pd.DataFrame(X_fraud_scaled, columns=X_fraud.columns)
+    
+    # Double-check that there are no NaN values before SMOTE
+    X_fraud_scaled = X_fraud_scaled.fillna(0)
     
     # Handle imbalanced data for fraud detection with SMOTE
     smote = SMOTE(random_state=42)
