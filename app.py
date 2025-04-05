@@ -191,21 +191,47 @@ def load_data():
                         credit_model_loaded = st.session_state.credit_model.load_model()
                         if not credit_model_loaded:
                             if (credit_data is not None and 
-                                isinstance(credit_data, pd.DataFrame) and 
-                                not credit_data.empty):
+                                isinstance(credit_data, dict) and 
+                                'X_train' in credit_data and 
+                                'y_train' in credit_data and 
+                                'features' in credit_data and 
+                                'scaler' in credit_data):
+                                
+                                # Make sure to set model features and scaler
+                                st.session_state.credit_model.features = credit_data['features']
+                                st.session_state.credit_model.scaler = credit_data['scaler']
                                 st.session_state.credit_model.train(credit_data)
                             else:
                                 st.warning("Cannot train credit model: Credit data is empty or invalid")
+                        # Even if model loaded, still set features/scaler from current data if available
+                        elif (credit_data is not None and isinstance(credit_data, dict) and 
+                              'features' in credit_data and 'scaler' in credit_data and
+                              st.session_state.credit_model.features is None):
+                            st.session_state.credit_model.features = credit_data['features']
+                            st.session_state.credit_model.scaler = credit_data['scaler']
                         
                         # Fraud model
                         fraud_model_loaded = st.session_state.fraud_model.load_model()
                         if not fraud_model_loaded:
                             if (fraud_data is not None and 
-                                isinstance(fraud_data, pd.DataFrame) and 
-                                not fraud_data.empty):
+                                isinstance(fraud_data, dict) and
+                                'X_train' in fraud_data and 
+                                'y_train' in fraud_data and 
+                                'features' in fraud_data and 
+                                'scaler' in fraud_data):
+                                
+                                # Make sure to set model features and scaler
+                                st.session_state.fraud_model.features = fraud_data['features']
+                                st.session_state.fraud_model.scaler = fraud_data['scaler']
                                 st.session_state.fraud_model.train(fraud_data)
                             else:
                                 st.warning("Cannot train fraud model: Fraud data is empty or invalid")
+                        # Even if model loaded, still set features/scaler from current data if available
+                        elif (fraud_data is not None and isinstance(fraud_data, dict) and 
+                              'features' in fraud_data and 'scaler' in fraud_data and
+                              st.session_state.fraud_model.features is None):
+                            st.session_state.fraud_model.features = fraud_data['features']
+                            st.session_state.fraud_model.scaler = fraud_data['scaler']
                         
                         # Evaluate models - with robust error handling
                         if st.session_state.credit_model.is_trained and st.session_state.credit_model.model is not None:

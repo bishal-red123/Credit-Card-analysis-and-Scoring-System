@@ -45,16 +45,38 @@ class CreditScoreModel:
             os.makedirs('models')
         
         if self.model:
-            joblib.dump(self.model, 'models/credit_score_model.joblib')
+            # Save the model, features, and scaler together as a dictionary
+            model_data = {
+                'model': self.model,
+                'features': self.features,
+                'scaler': self.scaler
+            }
+            joblib.dump(model_data, 'models/credit_score_model.joblib')
     
     def load_model(self):
         """
         Load the saved model from file
         """
         if os.path.exists('models/credit_score_model.joblib'):
-            self.model = joblib.load('models/credit_score_model.joblib')
-            self.is_trained = True
-            return True
+            try:
+                # Load the dictionary containing model, features, and scaler
+                model_data = joblib.load('models/credit_score_model.joblib')
+                
+                # Check if it's the old format (just the model) or new format (dictionary)
+                if isinstance(model_data, dict) and 'model' in model_data:
+                    self.model = model_data['model']
+                    self.features = model_data['features']
+                    self.scaler = model_data['scaler']
+                else:
+                    # Handle legacy format
+                    self.model = model_data
+                    # Features and scaler will need to be set separately
+                
+                self.is_trained = True if self.model is not None else False
+                return True
+            except Exception as e:
+                print(f"Error loading credit score model: {str(e)}")
+                return False
         return False
     
     def evaluate(self, credit_data):
