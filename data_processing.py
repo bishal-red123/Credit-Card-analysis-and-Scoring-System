@@ -77,6 +77,9 @@ def preprocess_data(data):
         labels=['Poor', 'Fair', 'Good', 'Excellent']
     )
     
+    # Handle any NaN values in credit_score_band (if a score doesn't fall into any bin)
+    data['credit_score_band'] = data['credit_score_band'].fillna('Fair')
+    
     # Create fraud flags based on suspicious patterns
     # This is a simplified version - in reality, we would use more sophisticated methods
     data['fraud_flag'] = 0
@@ -119,9 +122,13 @@ def preprocess_data(data):
     X_credit = data[credit_score_features].copy()
     y_credit = data['credit_score_band'].copy()
     
+    # Ensure no NaN values in target variables
+    y_credit = y_credit.fillna('Fair')
+    
     # Create feature matrix for fraud detection
     X_fraud = data[credit_score_features].copy()
     y_fraud = data['fraud_flag'].copy()
+    y_fraud = y_fraud.fillna(0)
     
     # Make sure there are no NaN values in X_fraud or X_credit
     X_credit = X_credit.fillna(0)
